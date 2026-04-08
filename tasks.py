@@ -70,7 +70,8 @@ class AnswerSelectionGrader:
         rq = _ranking_quality(action_selected, item["quality_ranking"])
         cal = _calibration(action_confidence, c)
 
-        score = round(0.7 * c + 0.3 * cal, 4)
+        raw = 0.7 * c + 0.3 * cal
+        score = round(max(0.01, min(0.99, raw)), 4)
         return GradeResult(score=score, correctness=c, ranking_quality=rq, calibration=cal)
 
 
@@ -92,7 +93,8 @@ class RankingSubtleGrader:
         rq = _ranking_quality(action_selected, item["quality_ranking"])
         cal = _calibration(action_confidence, c)
 
-        score = round(0.5 * c + 0.3 * rq + 0.2 * cal, 4)
+        raw = 0.5 * c + 0.3 * rq + 0.2 * cal
+        score = round(max(0.01, min(0.99, raw)), 4)
         return GradeResult(score=score, correctness=c, ranking_quality=rq, calibration=cal)
 
 
@@ -121,7 +123,7 @@ class AmbiguityCalibrationGrader:
             overconfidence_penalty = 0.1 * (action_confidence - 0.7)
 
         raw = 0.4 * c + 0.3 * rq + 0.3 * cal - overconfidence_penalty
-        score = round(max(0.0, min(1.0, raw)), 4)
+        score = round(max(0.01, min(0.99, raw)), 4)
         return GradeResult(score=score, correctness=c, ranking_quality=rq, calibration=cal)
 
 
