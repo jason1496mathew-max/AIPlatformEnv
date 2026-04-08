@@ -68,13 +68,26 @@ class AIPlatformEnv:
         if self._state.done:
             raise RuntimeError("Episode is already done. Call reset() to start a new one.")
 
-        # Validate index
+        # Tool Use: Search
+        if action.action_type == "search":
+            self._state.step_count += 1
+            self._state.history.append({
+                "step": self._state.step_count,
+                "action_type": "search",
+            })
+            obs = self._build_observation(done=False, last_reward=0.0)
+            obs.hint = self._current_item.get("hint", "No hint available.")
+            
+            return obs, 0.0, False, {}
+
+        # Answer logic
         n_candidates = len(self._current_item["candidates"])
-        if not (0 <= action.selected_index < n_candidates):
+        if action.selected_index is None or not (0 <= action.selected_index < n_candidates):
             raise ValueError(
-                f"selected_index {action.selected_index} out of range "
-                f"[0, {n_candidates - 1}]."
+                f"selected_index {action.selected_index} invalid for action_type='answer'."
             )
+        if action.confidence is None:
+            raise ValueError("confidence must be provided for action_type='answer'.")
 
         # Grade
         grader = GRADERS[self._task_name]
@@ -91,6 +104,7 @@ class AIPlatformEnv:
         self._state.history.append(
             {
                 "step": self._state.step_count,
+                "action_type": "answer",
                 "selected_index": action.selected_index,
                 "confidence": action.confidence,
                 "reasoning": action.reasoning,

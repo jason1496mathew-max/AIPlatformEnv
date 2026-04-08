@@ -37,7 +37,7 @@ MODEL_NAME: str = os.getenv("MODEL_NAME", "Qwen/Qwen2.5-72B-Instruct")
 ENV_BASE_URL: str = os.getenv("API_URL", "http://localhost:8000")
 
 BENCHMARK = "aiplatformenv"
-MAX_STEPS = 1          # single-step episodes
+MAX_STEPS = 3          # multi-step episodes
 TEMPERATURE = 0.2
 MAX_TOKENS = 300
 SUCCESS_SCORE_THRESHOLD = 0.5
@@ -64,15 +64,11 @@ def env_reset(task_name: str) -> dict:
     return resp.json()
 
 
-def env_step(selected_index: int, confidence: float, reasoning: str = "") -> dict:
+def env_step(action_payload: dict) -> dict:
     resp = httpx.post(
         f"{ENV_BASE_URL}/step",
-        json={
-            "selected_index": selected_index,
-            "confidence": confidence,
-            "reasoning": reasoning,
-        },
-        timeout=30,
+        json=action_payload,
+        timeout=60,
     )
     resp.raise_for_status()
     return resp.json()
@@ -83,27 +79,34 @@ def env_step(selected_index: int, confidence: float, reasoning: str = "") -> dic
 # ---------------------------------------------------------------------------
 
 SYSTEM_PROMPT = textwrap.dedent("""
-    You are an expert AI evaluator. You will be shown a question and a list of
-    numbered candidate answers. Your job is to:
-    1. Select the index (0-based) of the best / most correct answer.
-    2. Provide a confidence score between 0.0 and 1.0.
-    3. Give a brief 1–2 sentence reasoning.
-
-    Respond ONLY with valid JSON in this exact format:
-    {"selected_index": <int>, "confidence": <float>, "reasoning": "<string>"}
+    You are an expert AI evaluator holding a multi-step conversation.
+    Optional: If you need a hint, respond with:
+    {"action_type": "search"}
+    
+    If you are ready to answer, respond with:
+    {"action_type": "answer", "selected_index": <int>, "confidence": <float>, "reasoning": "..."}
 """).strip()
 
 
 def build_user_prompt(obs: dict) -> str:
     question = obs["question"]
     candidates = obs["candidate_responses"]
-    lines = [f"Question: {question}", "", "Candidate responses:"]
+    hint = obs.get("hint", None)
+    step = obs.get("step", 0)
+
+    lines = [f"Question: {question}", ""]
+    if hint:
+        lines.append(f"--- HINT RECEIVED ---\n{hint}\n---------------------\n")
+        
+    lines.append("Candidate responses:")
     for i, c in enumerate(candidates):
         lines.append(f"  [{i}] {c}")
     lines.append("")
-    lines.append(
-        "Respond with JSON: {\"selected_index\": <int>, \"confidence\": <float>, \"reasoning\": \"<str>\"}"
-    )
+    
+    if step == 0:
+        lines.append("Instruction: You MUST execute a search action to gather more information. Respond ONLY with: {\"action_type\": \"search\"}")
+    else:
+        lines.append("Instruction: Now provide your final answer. Respond ONLY with: {\"action_type\": \"answer\", \"selected_index\": <int>, \"confidence\": <float>, \"reasoning\": \"<str>\"}")
     return "\n".join(lines)
 
 
@@ -129,7 +132,7 @@ def call_llm(prompt: str) -> dict:
         return json.loads(raw)
     except json.JSONDecodeError:
         # fallback
-        return {"selected_index": 0, "confidence": 0.5, "reasoning": raw}
+        return {"action_type": "answer", "selected_index": 0, "confidence": 0.5, "reasoning": raw}
 
 
 # ---------------------------------------------------------------------------
@@ -163,18 +166,30 @@ def run_task(task_name: str) -> float:
                 user_prompt = build_user_prompt(obs)
                 llm_out = call_llm(user_prompt)
 
-                selected_index = int(llm_out.get("selected_index", 0))
+                action_type = llm_out.get("action_type", "answer")
+                selected_index = llm_out.get("selected_index", 0)
                 confidence = float(llm_out.get("confidence", 0.5))
                 reasoning = str(llm_out.get("reasoning", ""))
                 confidence = max(0.0, min(1.0, confidence))
 
-                action_str = f"select({selected_index}, conf={confidence:.2f})"
+                if action_type == "search":
+                    action_str = "search()"
+                    action_payload = {"action_type": "search"}
+                else:
+                    action_str = f"answer(index={selected_index}, conf={confidence:.2f})"
+                    action_payload = {
+                        "action_type": "answer",
+                        "selected_index": selected_index,
+                        "confidence": confidence,
+                        "reasoning": reasoning,
+                    }
 
-                result = env_step(selected_index, confidence, reasoning)
+                result = env_step(action_payload)
                 reward = float(result["reward"])
                 done = bool(result["done"])
                 obs = result["observation"]
-                final_score = reward
+                if done:
+                    final_score = reward
 
             except Exception as e:
                 last_error = str(e)

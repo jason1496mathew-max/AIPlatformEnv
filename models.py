@@ -22,6 +22,10 @@ class AIPlatformObservation(BaseModel):
         default=None,
         description="Ground-truth index (exposed only after episode ends, None during play)."
     )
+    hint: Optional[str] = Field(
+        default=None,
+        description="Optional hint provided if the agent invokes the search action."
+    )
     metadata: Dict[str, Any] = Field(
         default_factory=dict,
         description="Extra info: task name, difficulty, domain.",
@@ -38,12 +42,17 @@ class AIPlatformObservation(BaseModel):
 class AIPlatformAction(BaseModel):
     """What the agent submits each step."""
 
-    selected_index: int = Field(
-        description="Zero-based index into candidate_responses the agent believes is best."
+    action_type: str = Field(
+        default="answer",
+        description="Must be 'answer' or 'search'. Search fetches a hint without ending the episode."
     )
-    confidence: float = Field(
-        ge=0.0, le=1.0,
-        description="Agent confidence in its selection (0.0 = not confident, 1.0 = certain)."
+    selected_index: Optional[int] = Field(
+        default=None,
+        description="Zero-based index into candidate_responses. Required if action_type == 'answer'."
+    )
+    confidence: Optional[float] = Field(
+        default=None, ge=0.0, le=1.0,
+        description="Agent confidence in its selection. Required if action_type == 'answer'."
     )
     reasoning: Optional[str] = Field(
         default=None,
@@ -61,7 +70,7 @@ class AIPlatformState(BaseModel):
     task_name: str = Field(description="Active task identifier.")
     episode_id: str = Field(description="Unique episode UUID.")
     step_count: int = Field(default=0)
-    max_steps: int = Field(default=1, description="Max steps per episode (1 for single-step tasks).")
+    max_steps: int = Field(default=3, description="Max steps per episode.")
     cumulative_reward: float = Field(default=0.0)
     history: List[Dict[str, Any]] = Field(
         default_factory=list,

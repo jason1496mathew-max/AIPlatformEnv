@@ -29,21 +29,21 @@ tasks:
     display_name: "Answer Selection"
     difficulty: easy
     description: "Select the single correct answer from obvious distractors."
-    max_steps: 1
+    max_steps: 3
     score_range: [0.0, 1.0]
 
   - name: ranking_subtle
     display_name: "Ranking Subtle Differences"
     difficulty: medium
     description: "Identify the best response among several plausible options."
-    max_steps: 1
+    max_steps: 3
     score_range: [0.0, 1.0]
 
   - name: ambiguity_calibration
     display_name: "Ambiguity & Calibration"
     difficulty: hard
     description: "All candidates are partially correct; agent must pick the best AND be well-calibrated."
-    max_steps: 1
+    max_steps: 3
     score_range: [0.0, 1.0]
 
 observation_space:
@@ -51,6 +51,7 @@ observation_space:
   fields:
     question: string
     candidate_responses: "list[string]"
+    hint: "string (optional)"
     metadata: object
     step: integer
     done: boolean
@@ -59,8 +60,9 @@ observation_space:
 action_space:
   type: object
   fields:
-    selected_index: integer
-    confidence: "float [0.0, 1.0]"
+    action_type: "string ('answer' or 'search')"
+    selected_index: "integer (optional)"
+    confidence: "float [0.0, 1.0] (optional)"
     reasoning: "string (optional)"
 
 reward:

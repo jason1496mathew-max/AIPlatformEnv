@@ -24,6 +24,7 @@ TASK_DATA = {
             "correct_index": 0,
             "quality_ranking": [0, 3, 1, 2],
             "difficulty": "easy",
+            "hint": "Hint retrieved: take extra time to analyze the formatting, ambiguity, and logic of all candidates.",
             "domain": "science",
         },
         {
@@ -37,6 +38,7 @@ TASK_DATA = {
             "correct_index": 3,
             "quality_ranking": [3, 0, 1, 2],
             "difficulty": "easy",
+            "hint": "Hint retrieved: take extra time to analyze the formatting, ambiguity, and logic of all candidates.",
             "domain": "astronomy",
         },
         {
@@ -50,6 +52,7 @@ TASK_DATA = {
             "correct_index": 1,
             "quality_ranking": [1, 0, 3, 2],
             "difficulty": "easy",
+            "hint": "Hint retrieved: take extra time to analyze the formatting, ambiguity, and logic of all candidates.",
             "domain": "history",
         },
         {
@@ -63,6 +66,7 @@ TASK_DATA = {
             "correct_index": 2,
             "quality_ranking": [2, 3, 1, 0],
             "difficulty": "easy",
+            "hint": "Hint retrieved: take extra time to analyze the formatting, ambiguity, and logic of all candidates.",
             "domain": "mathematics",
         },
         {
@@ -76,6 +80,7 @@ TASK_DATA = {
             "correct_index": 2,
             "quality_ranking": [2, 0, 3, 1],
             "difficulty": "easy",
+            "hint": "Hint retrieved: take extra time to analyze the formatting, ambiguity, and logic of all candidates.",
             "domain": "literature",
         },
     ],
@@ -102,6 +107,7 @@ TASK_DATA = {
             "correct_index": 1,
             "quality_ranking": [1, 3, 0, 2],
             "difficulty": "medium",
+            "hint": "Hint retrieved: take extra time to analyze the formatting, ambiguity, and logic of all candidates.",
             "domain": "biology",
         },
         {
@@ -123,6 +129,7 @@ TASK_DATA = {
             "correct_index": 2,
             "quality_ranking": [2, 0, 3, 1],
             "difficulty": "medium",
+            "hint": "Hint retrieved: take extra time to analyze the formatting, ambiguity, and logic of all candidates.",
             "domain": "software_engineering",
         },
         {
@@ -146,6 +153,7 @@ TASK_DATA = {
             "correct_index": 2,
             "quality_ranking": [2, 3, 0, 1],
             "difficulty": "medium",
+            "hint": "Hint retrieved: take extra time to analyze the formatting, ambiguity, and logic of all candidates.",
             "domain": "finance",
         },
         {
@@ -170,6 +178,7 @@ TASK_DATA = {
             "correct_index": 1,
             "quality_ranking": [1, 3, 0, 2],
             "difficulty": "medium",
+            "hint": "Hint retrieved: take extra time to analyze the formatting, ambiguity, and logic of all candidates.",
             "domain": "management",
         },
         {
@@ -191,6 +200,7 @@ TASK_DATA = {
             "correct_index": 1,
             "quality_ranking": [1, 2, 3, 0],
             "difficulty": "medium",
+            "hint": "Hint retrieved: take extra time to analyze the formatting, ambiguity, and logic of all candidates.",
             "domain": "machine_learning",
         },
     ],
@@ -226,6 +236,7 @@ TASK_DATA = {
             "correct_index": 2,
             "quality_ranking": [2, 1, 3, 0],
             "difficulty": "hard",
+            "hint": "Hint retrieved: take extra time to analyze the formatting, ambiguity, and logic of all candidates.",
             "domain": "software_architecture",
         },
         {
@@ -255,6 +266,7 @@ TASK_DATA = {
             "correct_index": 2,
             "quality_ranking": [2, 1, 0, 3],
             "difficulty": "hard",
+            "hint": "Hint retrieved: take extra time to analyze the formatting, ambiguity, and logic of all candidates.",
             "domain": "ai_ethics",
         },
         {
@@ -283,6 +295,7 @@ TASK_DATA = {
             "correct_index": 2,
             "quality_ranking": [2, 1, 3, 0],
             "difficulty": "hard",
+            "hint": "Hint retrieved: take extra time to analyze the formatting, ambiguity, and logic of all candidates.",
             "domain": "data_science",
         },
         {
@@ -308,6 +321,7 @@ TASK_DATA = {
             "correct_index": 2,
             "quality_ranking": [2, 3, 0, 1],
             "difficulty": "hard",
+            "hint": "Hint retrieved: take extra time to analyze the formatting, ambiguity, and logic of all candidates.",
             "domain": "philosophy",
         },
         {
@@ -335,6 +349,7 @@ TASK_DATA = {
             "correct_index": 2,
             "quality_ranking": [2, 3, 0, 1],
             "difficulty": "hard",
+            "hint": "Hint retrieved: take extra time to analyze the formatting, ambiguity, and logic of all candidates.",
             "domain": "cybersecurity",
         },
     ],
