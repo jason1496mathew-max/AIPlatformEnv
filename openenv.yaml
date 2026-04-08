@@ -1,0 +1,72 @@
+name: aiplatformenv
+version: "1.0.0"
+description: >
+  An OpenEnv environment where an AI agent evaluates the quality of AI-generated responses.
+  The agent selects the best candidate answer to a question and provides a calibrated
+  confidence score. Three tasks of increasing difficulty: answer selection (easy),
+  ranking subtle differences (medium), and ambiguity + calibration (hard).
+
+spec_version: "0.1"
+type: environment
+tags:
+  - openenv
+  - llm-evaluation
+  - response-ranking
+  - confidence-calibration
+  - real-world
+
+author: AIPlatformEnv Team
+
+runtime:
+  type: docker
+  port: 8000
+
+app:
+  command: ["uvicorn", "server:app", "--host", "0.0.0.0", "--port", "8000"]
+
+tasks:
+  - name: answer_selection
+    display_name: "Answer Selection"
+    difficulty: easy
+    description: "Select the single correct answer from obvious distractors."
+    max_steps: 1
+    score_range: [0.0, 1.0]
+
+  - name: ranking_subtle
+    display_name: "Ranking Subtle Differences"
+    difficulty: medium
+    description: "Identify the best response among several plausible options."
+    max_steps: 1
+    score_range: [0.0, 1.0]
+
+  - name: ambiguity_calibration
+    display_name: "Ambiguity & Calibration"
+    difficulty: hard
+    description: "All candidates are partially correct; agent must pick the best AND be well-calibrated."
+    max_steps: 1
+    score_range: [0.0, 1.0]
+
+observation_space:
+  type: object
+  fields:
+    question: string
+    candidate_responses: "list[string]"
+    metadata: object
+    step: integer
+    done: boolean
+    last_reward: float
+
+action_space:
+  type: object
+  fields:
+    selected_index: integer
+    confidence: "float [0.0, 1.0]"
+    reasoning: "string (optional)"
+
+reward:
+  type: float
+  range: [0.0, 1.0]
+  signals:
+    - correctness
+    - ranking_quality
+    - calibration
